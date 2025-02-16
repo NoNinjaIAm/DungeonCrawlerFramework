@@ -63,8 +63,6 @@ public class DungeonGenerator : MonoBehaviour
         {
             k++;
 
-            //graph[curRoomKey].visited = true;
-
             // Get valid neighbors spots
             List<Vector2Int> neighbors = CheckNeighbors(curRoomKey);
 
