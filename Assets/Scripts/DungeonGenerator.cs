@@ -16,7 +16,7 @@ public class DungeonGenerator : MonoBehaviour
     // This is the grid with all of the rooms in it
     // Bottom left of the grid is 0, 0
     // Graph is always positive numbers
-    Dictionary<Vector2Int, Room> graph = new Dictionary<Vector2Int, Room>(); // Holds every room based on grid position
+    public Dictionary<Vector2Int, Room> graph = new Dictionary<Vector2Int, Room>(); // Holds every room based on grid position
 
     public Vector2 offset;
     public Vector2Int size;
