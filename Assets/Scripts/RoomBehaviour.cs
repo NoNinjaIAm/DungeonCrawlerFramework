@@ -6,6 +6,7 @@ public class RoomBehaviour : MonoBehaviour
 {
     public GameObject[] walls; // 0 - North 1 -South 2 - East 3- West
     public GameObject[] doors;
+    public GameObject sucessObject;
 
     public void UpdateRoom(List<string> directions)
     {
@@ -26,6 +27,11 @@ public class RoomBehaviour : MonoBehaviour
 
         if (directions.Contains("West")) SetDoorStatus(true, 3);
         else SetDoorStatus(false, 3);
+    }
+
+    public void MakeEndRoom()
+    {
+        sucessObject.SetActive(true);
     }
 
     private void SetDoorStatus(bool value, int index)

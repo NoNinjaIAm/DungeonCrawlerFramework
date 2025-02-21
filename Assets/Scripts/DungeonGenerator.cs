@@ -8,7 +8,6 @@ using UnityEngine.Analytics;
 
 public class DungeonGenerator : MonoBehaviour
 {
-
     public class Room
     {
         public Dictionary<Room, (float cost, string direction)> neighbors = new Dictionary<Room, (float cost, string direction)>();  // Adjacent rooms with movement cost
@@ -23,8 +22,11 @@ public class DungeonGenerator : MonoBehaviour
     public Vector2Int size;
     public GameObject roomPrefab;
 
+    public static event System.Action OnMazeGenerated;
+
     // TO DO: Change this so it clamps to valid values when assigned
     public Vector2Int startPos = new Vector2Int(0, 0);
+    public Vector2Int endPos;
 
     // Prob of Random doors being spawned
     public float roomExtraDoorProb = 0.1f;
@@ -33,6 +35,8 @@ public class DungeonGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        endPos = new Vector2Int(size.x-1, size.y-1);
+
         MazeGenerator();
     }
 
@@ -49,6 +53,11 @@ public class DungeonGenerator : MonoBehaviour
 
             var newRoom = Instantiate(roomPrefab, new Vector3(kvp.Key.x * offset.x, 0, kvp.Key.y * offset.y), Quaternion.identity, transform).GetComponent<RoomBehaviour>();
             newRoom.UpdateRoom(directions);
+            if(kvp.Key == endPos)
+            {
+                UnityEngine.Debug.Log("Placing End Room at " + kvp.Key.x + "-" + kvp.Key.y);
+                newRoom.MakeEndRoom();
+            }
 
             newRoom.name += " " + kvp.Key.x + "-" + kvp.Key.y;
         }
@@ -192,6 +201,8 @@ public class DungeonGenerator : MonoBehaviour
                 
             }
         }
+
+        OnMazeGenerated?.Invoke();
     }
 
     // Checking each neighbor for if a room could exist there and if we haven't already visited that room
