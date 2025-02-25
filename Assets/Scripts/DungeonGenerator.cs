@@ -22,7 +22,7 @@ public class DungeonGenerator : MonoBehaviour
     public Vector2Int size;
     public GameObject roomPrefab;
 
-    public static event System.Action OnMazeGenerated;
+    public event System.Action OnMazeGenerated;
 
     // TO DO: Change this so it clamps to valid values when assigned
     public Vector2Int startPos = new Vector2Int(0, 0);
