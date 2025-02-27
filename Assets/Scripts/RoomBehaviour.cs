@@ -1,14 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Video;
+using static DungeonGenerator;
 
 public class RoomBehaviour : MonoBehaviour
 {
     public GameObject[] walls; // 0 - North 1 -South 2 - East 3- West
     public GameObject[] doors;
     public GameObject sucessObject;
+    public GameObject shortestPathHighlight;
+    public Vector2Int myGridPosition;
 
-    public void UpdateRoom(List<string> directions)
+    private void Start()
+    {
+        Debug.Log("Room" + myGridPosition.x + "-" + myGridPosition.y + "is ready to listen for shortest path");
+        FindShortestPath.Instance.OnPathUpdated += OnPathUpdated;
+    }
+
+    public void UpdateDoorways(List<string> directions)
     {
         //for (int i = 0; i < status.Length; i++)
         //{
@@ -38,5 +48,34 @@ public class RoomBehaviour : MonoBehaviour
     {
         doors[index].SetActive(value);
         walls[index].SetActive(!value);
+    }
+
+    private void OnPathUpdated(List<Room> path)
+    {
+        bool inPath = false;
+        foreach (var room in path)
+        {
+            if (room.position == myGridPosition)
+            {
+                inPath = true;
+                break;
+            }
+        }
+
+        if (inPath)
+        {
+            Debug.Log("Room" + myGridPosition.x + "-" + myGridPosition.y + "IS IN THE PATH");
+            shortestPathHighlight.SetActive(true);
+        }
+        else
+        {
+            Debug.Log("Room" + myGridPosition.x + "-" + myGridPosition.y + "IS NOT IN THE PATH");
+            shortestPathHighlight.SetActive(false);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        FindShortestPath.Instance.OnPathUpdated -= OnPathUpdated;
     }
 }

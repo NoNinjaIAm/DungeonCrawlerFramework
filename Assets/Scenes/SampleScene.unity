@@ -254,6 +254,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 818965956}
+  - component: {fileID: 818965957}
   m_Layer: 0
   m_Name: ShortestPathFinder
   m_TagString: Untagged
@@ -276,6 +277,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &818965957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 818965955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a69bd13356f08e4b9164d3dfa382a3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dungeonGenerator: {fileID: 1368065296}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -477,7 +491,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   offset: {x: 6, y: 6}
-  size: {x: 10, y: 10}
+  size: {x: 5, y: 5}
   roomPrefab: {fileID: 2563716252517242340, guid: f0607b7876611de4197b8fb18d024df8, type: 3}
   startPos: {x: 0, y: 0}
   endPos: {x: 0, y: 0}

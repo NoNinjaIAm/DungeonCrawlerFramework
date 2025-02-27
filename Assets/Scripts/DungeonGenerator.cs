@@ -10,6 +10,7 @@ public class DungeonGenerator : MonoBehaviour
 {
     public class Room
     {
+        public Vector2Int position; // Room's coordinates for Manhattan distance
         public Dictionary<Room, (float cost, string direction)> neighbors = new Dictionary<Room, (float cost, string direction)>();  // Adjacent rooms with movement cost
     }
 
@@ -52,15 +53,23 @@ public class DungeonGenerator : MonoBehaviour
             }
 
             var newRoom = Instantiate(roomPrefab, new Vector3(kvp.Key.x * offset.x, 0, kvp.Key.y * offset.y), Quaternion.identity, transform).GetComponent<RoomBehaviour>();
-            newRoom.UpdateRoom(directions);
+            
+            newRoom.UpdateDoorways(directions);
+            newRoom.myGridPosition = kvp.Key;
+            
+            // Spawning target room object
             if(kvp.Key == endPos)
             {
                 UnityEngine.Debug.Log("Placing End Room at " + kvp.Key.x + "-" + kvp.Key.y);
                 newRoom.MakeEndRoom();
             }
 
+            // Printing room name
             newRoom.name += " " + kvp.Key.x + "-" + kvp.Key.y;
+
         }
+        // Dungeon has been generated event
+        OnMazeGenerated?.Invoke();
     }
 
     void MazeGenerator()
@@ -73,7 +82,9 @@ public class DungeonGenerator : MonoBehaviour
         int k = 0;
 
         // Add starting room to the graph and save it as current room
-        graph.Add(startPos, new Room());
+        var tempRoom = new Room();
+        tempRoom.position = startPos;
+        graph.Add(startPos, tempRoom);
         Vector2Int curRoomKey = startPos;
         
         while(k<10000)
@@ -101,7 +112,9 @@ public class DungeonGenerator : MonoBehaviour
                 // Create new room from previous if it does not exist (shouldn't exist yet actually)
                 if (!graph.ContainsKey(newRoomKey))
                 {
-                    graph.Add(newRoomKey, new Room());
+                    tempRoom = new Room();
+                    tempRoom.position = curRoomKey;
+                    graph.Add(newRoomKey, tempRoom);
                     UnityEngine.Debug.Log("Creating Room at grid Cords: " + newRoomKey.x + " " + newRoomKey.y);
                 }
 
@@ -202,7 +215,6 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
 
-        OnMazeGenerated?.Invoke();
     }
 
     // Checking each neighbor for if a room could exist there and if we haven't already visited that room

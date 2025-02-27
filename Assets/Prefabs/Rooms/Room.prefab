@@ -168,6 +168,8 @@ MonoBehaviour:
   - {fileID: 525632835237357200}
   - {fileID: 3919204462818974720}
   sucessObject: {fileID: 5962081383554982162}
+  shortestPathHighlight: {fileID: 42149402191963887}
+  myGridPosition: {x: 0, y: 0}
 --- !u!1 &2759357869518209972
 GameObject:
   m_ObjectHideFlags: 0
