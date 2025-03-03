@@ -74,11 +74,16 @@ public class FindShortestPath : MonoBehaviour
             openSet.Remove(currentRoom);
             closedSet.Add(currentRoom);
 
+            Debug.Log($"Processing room {currentRoom.position.x}-{currentRoom.position.y}");
+            Debug.Log("Has neighbors: ");
+
             // Process each neighboring room
             foreach (var neighborPair in currentRoom.neighbors)
             {
                 Room neighbor = neighborPair.Key;
                 float moveCost = neighborPair.Value.cost;
+
+                Debug.Log(neighbor.position.x + " " + neighbor.position.y);
 
                 if (closedSet.Contains(neighbor))
                     continue; // Skip already processed rooms
@@ -110,7 +115,11 @@ public class FindShortestPath : MonoBehaviour
         {
             currentRoom = cameFrom[currentRoom];
             path.Add(currentRoom);
+
+            Debug.Log("Shortest Path: " + currentRoom.position.x + " " + currentRoom.position.y);
         }
+
+        
 
         path.Reverse(); // Start from beginning
         return path;

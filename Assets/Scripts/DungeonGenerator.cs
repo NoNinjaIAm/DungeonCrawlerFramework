@@ -113,7 +113,7 @@ public class DungeonGenerator : MonoBehaviour
                 if (!graph.ContainsKey(newRoomKey))
                 {
                     tempRoom = new Room();
-                    tempRoom.position = curRoomKey;
+                    tempRoom.position = newRoomKey;
                     graph.Add(newRoomKey, tempRoom);
                     UnityEngine.Debug.Log("Creating Room at grid Cords: " + newRoomKey.x + " " + newRoomKey.y);
                 }
