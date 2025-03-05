@@ -12,6 +12,8 @@ public class DungeonGenerator : MonoBehaviour
     {
         public Vector2Int position; // Room's coordinates for Manhattan distance
         public Dictionary<Room, (float cost, string direction)> neighbors = new Dictionary<Room, (float cost, string direction)>();  // Adjacent rooms with movement cost
+        public float weight = 1.0f;
+        public bool hasObstacles = false;
     }
 
     // This is the grid with all of the rooms in it
@@ -29,8 +31,9 @@ public class DungeonGenerator : MonoBehaviour
     public Vector2Int startPos = new Vector2Int(0, 0);
     public Vector2Int endPos;
 
-    // Prob of Random doors being spawned
+    // Probabilities
     public float roomExtraDoorProb = 0.1f;
+    public float roomObstacleSpawnProb = 0.1f;
 
 
     // Start is called before the first frame update
@@ -70,6 +73,39 @@ public class DungeonGenerator : MonoBehaviour
         }
         // Dungeon has been generated event
         OnMazeGenerated?.Invoke();
+    }
+
+    void SpawnObstacles()
+    {
+        foreach (var kvp in graph)
+        {
+            if(Random.value < roomObstacleSpawnProb)
+            {
+                //Spawn Obstacles in current room
+                var curRoomKey = kvp.Key;
+
+                UnityEngine.Debug.Log("Placing Obstacles in room:  " + curRoomKey.x + " " + curRoomKey.y);
+
+                // Changing every weight to travel to neighbors
+                //foreach (var neighborKVP in graph[curRoomKey].neighbors)
+                //{
+                //    string direction = graph[curRoomKey].neighbors[neighborKVP.Key].direction;
+
+                //    graph[curRoomKey].neighbors[neighborKVP.Key] = (20f, direction);
+                //    UnityEngine.Debug.Log("Obstacle room:  " + curRoomKey.x + " " + curRoomKey.y + "has weighted travel to room " + graph[curRoomKey].neighbors[neighborKVP.Key].direction);
+                //}
+
+                foreach (var key in new List<Room>(graph[curRoomKey].neighbors.Keys))
+                {
+                    string direction = graph[curRoomKey].neighbors[key].direction;
+
+                    graph[curRoomKey].neighbors[key] = (20f, direction);
+                    UnityEngine.Debug.Log("Obstacle room:  " + curRoomKey.x + " " + curRoomKey.y + "has weighted travel to room " + graph[curRoomKey].neighbors[key].direction);
+                }
+
+                
+            }
+        }
     }
 
     void MazeGenerator()
@@ -120,39 +156,40 @@ public class DungeonGenerator : MonoBehaviour
 
                 if(newRoomKey.y >  curRoomKey.y)
                 {
-                    // Going up
-                    graph[curRoomKey].neighbors.Add(graph[newRoomKey], (1f, "North"));
-                    graph[newRoomKey].neighbors.Add(graph[curRoomKey], (1f, "South"));
+                    // Going North
+                    graph[curRoomKey].neighbors.Add(graph[newRoomKey], (graph[curRoomKey].weight, "North"));
+                    graph[newRoomKey].neighbors.Add(graph[curRoomKey], (graph[newRoomKey].weight, "South"));
                     curRoomKey = newRoomKey;
 
                 }
                 else if (newRoomKey.y < curRoomKey.y)
                 {
-                    // Going down
-                    graph[curRoomKey].neighbors.Add(graph[newRoomKey], (1f, "South"));
-                    graph[newRoomKey].neighbors.Add(graph[curRoomKey], (1f, "North"));
+                    // Going South
+                    graph[curRoomKey].neighbors.Add(graph[newRoomKey], (graph[curRoomKey].weight, "South"));
+                    graph[newRoomKey].neighbors.Add(graph[curRoomKey], (graph[newRoomKey].weight, "North"));
                     curRoomKey = newRoomKey;
 
                 }
                 else if (newRoomKey.x > curRoomKey.x)
                 {
-                    // Going right
-                    graph[curRoomKey].neighbors.Add(graph[newRoomKey], (1f, "East"));
-                    graph[newRoomKey].neighbors.Add(graph[curRoomKey], (1f, "West"));
+                    // Going East
+                    graph[curRoomKey].neighbors.Add(graph[newRoomKey], (graph[curRoomKey].weight, "East"));
+                    graph[newRoomKey].neighbors.Add(graph[curRoomKey], (graph[newRoomKey].weight, "West"));
                     curRoomKey = newRoomKey;
 
                 }
                 else
                 {
-                    // Going left
-                    graph[curRoomKey].neighbors.Add(graph[newRoomKey], (1f, "West"));
-                    graph[newRoomKey].neighbors.Add(graph[curRoomKey], (1f, "East"));
+                    // Going West
+                    graph[curRoomKey].neighbors.Add(graph[newRoomKey], (graph[curRoomKey].weight, "West"));
+                    graph[newRoomKey].neighbors.Add(graph[curRoomKey], (graph[newRoomKey].weight, "East"));
                     curRoomKey = newRoomKey;
 
                 }
             }
         }
-        PlaceRandomDoors();
+        PlaceRandomDoorsAndObstacles();
+        SpawnObstacles();
         GenerateDungeon();
 
         // Evaluating time took
@@ -161,10 +198,11 @@ public class DungeonGenerator : MonoBehaviour
     }
 
     // Runs through the maze and places doors. Some rooms get no extra doors, and some may get 1, 2, or 3.
-    private void PlaceRandomDoors()
+    private void PlaceRandomDoorsAndObstacles()
     {
         foreach (var kvp in graph)
         {
+            // Spawn random door/s
             if (Random.value < roomExtraDoorProb)
             {
                 var curRoomKey = kvp.Key;
@@ -178,41 +216,43 @@ public class DungeonGenerator : MonoBehaviour
 
                     if (newRoomKey.y > curRoomKey.y)
                     {
-                        // Going up
-                        graph[curRoomKey].neighbors.Add(graph[newRoomKey], (1f, "North"));
-                        graph[newRoomKey].neighbors.Add(graph[curRoomKey], (1f, "South"));
+                        // Place Edge North
+                        graph[curRoomKey].neighbors.Add(graph[newRoomKey], (graph[curRoomKey].weight, "North"));
+                        graph[newRoomKey].neighbors.Add(graph[curRoomKey], (graph[newRoomKey].weight, "South"));
 
                     }
                     else if (newRoomKey.y < curRoomKey.y)
                     {
-                        // Going down
-                        graph[curRoomKey].neighbors.Add(graph[newRoomKey], (1f, "South"));
-                        graph[newRoomKey].neighbors.Add(graph[curRoomKey], (1f, "North"));
+                        // Place Edge South
+                        graph[curRoomKey].neighbors.Add(graph[newRoomKey], (graph[curRoomKey].weight, "South"));
+                        graph[newRoomKey].neighbors.Add(graph[curRoomKey], (graph[newRoomKey].weight, "North"));
 
                     }
                     else if (newRoomKey.x > curRoomKey.x)
                     {
-                        // Going right
-                        graph[curRoomKey].neighbors.Add(graph[newRoomKey], (1f, "East"));
-                        graph[newRoomKey].neighbors.Add(graph[curRoomKey], (1f, "West"));
+                        // Place Edge East
+                        graph[curRoomKey].neighbors.Add(graph[newRoomKey], (graph[curRoomKey].weight, "East"));
+                        graph[newRoomKey].neighbors.Add(graph[curRoomKey], (graph[newRoomKey].weight, "West"));
 
                     }
                     else
                     {
-                        // Going left
-                        graph[curRoomKey].neighbors.Add(graph[newRoomKey], (1f, "West"));
-                        graph[newRoomKey].neighbors.Add(graph[curRoomKey], (1f, "East"));
+                        // Place Edge West
+                        graph[curRoomKey].neighbors.Add(graph[newRoomKey], (graph[curRoomKey].weight, "West"));
+                        graph[newRoomKey].neighbors.Add(graph[curRoomKey], (graph[newRoomKey].weight, "East"));
 
                     }
 
                     UnityEngine.Debug.Log("Placing Random Door at Room: " + curRoomKey.x + " " + curRoomKey.y + " Connecting it to Room " + newRoomKey.x + " " + newRoomKey.y);
+                    UnityEngine.Debug.Log("To cost: " + graph[curRoomKey].weight + " From Cost: " + graph[newRoomKey].weight);
 
-                    // Decide whether to place another door or not
+                    // Decide whether to place another door or not based on probability
                     if (Random.value < roomExtraDoorProb) continue;
                     else break;
                 }
-                
             }
+
+            
         }
 
     }

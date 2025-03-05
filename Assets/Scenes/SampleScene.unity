@@ -491,11 +491,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   offset: {x: 6, y: 6}
-  size: {x: 5, y: 100}
+  size: {x: 5, y: 5}
   roomPrefab: {fileID: 2563716252517242340, guid: f0607b7876611de4197b8fb18d024df8, type: 3}
   startPos: {x: 0, y: 0}
   endPos: {x: 0, y: 0}
-  roomExtraDoorProb: 0.5
+  roomExtraDoorProb: 1
+  roomObstacleSpawnProb: 0
 --- !u!4 &1368065297
 Transform:
   m_ObjectHideFlags: 0
