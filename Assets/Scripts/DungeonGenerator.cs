@@ -40,6 +40,10 @@ public class DungeonGenerator : MonoBehaviour
     {
         endPos = new Vector2Int(size.x-1, size.y-1);
 
+        size = new Vector2Int(GlobalOptions.Instance.xDungeonSize, GlobalOptions.Instance.xDungeonSize);
+        roomExtraDoorProb = GlobalOptions.Instance.extraDoorProb;
+        roomObstacleSpawnProb = GlobalOptions.Instance.obsSpawnProb;
+
         MazeGenerator();
     }
 
