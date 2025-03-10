@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using NUnit.Framework;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using System.Diagnostics;
 
 using Room = DungeonGenerator.Room;
 
@@ -21,6 +22,11 @@ public class FindShortestPath : MonoBehaviour
 
     private List<Room> shortestPath;
 
+    public event System.Action<float> OnAStarFinished;
+    private float timeTaken;
+
+
+
     private void Awake()
     {
         // Static singleton instance
@@ -33,17 +39,23 @@ public class FindShortestPath : MonoBehaviour
         dungeonGenerator.OnMazeGenerated += OnMazeGenerated;
     }
     
-    private void OnMazeGenerated()
+    private void OnMazeGenerated(float time)
     {
-        Debug.Log("Looking for shortest path");
+        UnityEngine.Debug.Log("Looking for shortest path");
         startRoom = dungeonGenerator.graph[dungeonGenerator.startPos];
         targetRoom = dungeonGenerator.graph[dungeonGenerator.endPos];
-        shortestPath = AStar(startRoom, targetRoom);
 
-        Debug.Log("Shortest path found! It is this: ");
+        // Do AStar and Time it
+        Stopwatch stopwatch = Stopwatch.StartNew();
+        shortestPath = AStar(startRoom, targetRoom);
+        timeTaken = stopwatch.ElapsedMilliseconds;
+        UnityEngine.Debug.Log($"AStar Took {timeTaken} ms.");
+        OnAStarFinished?.Invoke( timeTaken ); // Signal
+
+        UnityEngine.Debug.Log("Shortest path found! It is this: ");
         foreach (var room in shortestPath)
         {
-            Debug.Log("Room" + room.position.x + "-" + room.position.y);
+            UnityEngine.Debug.Log("Room" + room.position.x + "-" + room.position.y);
         }
 
         StartCoroutine(DelayedSignalInvoke());
@@ -51,6 +63,7 @@ public class FindShortestPath : MonoBehaviour
 
     public static List<Room> AStar (Room startRoom, Room targetRoom)
     {
+
         // Open Set: Rooms to evaluate
         List<Room> openSet = new List<Room> { startRoom };
 
@@ -77,7 +90,7 @@ public class FindShortestPath : MonoBehaviour
             openSet.Remove(currentRoom);
             closedSet.Add(currentRoom);
 
-            Debug.Log($"Processing room {currentRoom.position.x}-{currentRoom.position.y}");
+            UnityEngine.Debug.Log($"Processing room {currentRoom.position.x}-{currentRoom.position.y}");
             // Debug.Log("Has neighbors: ");
 
             // Process each neighboring room
@@ -117,7 +130,7 @@ public class FindShortestPath : MonoBehaviour
             currentRoom = cameFrom[currentRoom];
             path.Add(currentRoom);
 
-            Debug.Log("Shortest Path: " + currentRoom.position.x + " " + currentRoom.position.y);
+            UnityEngine.Debug.Log("Shortest Path: " + currentRoom.position.x + " " + currentRoom.position.y);
         }
 
         
@@ -133,9 +146,9 @@ public class FindShortestPath : MonoBehaviour
 
     IEnumerator DelayedSignalInvoke()
     {
-        Debug.Log("Before pause");
-        yield return new WaitForSeconds(5f); // Waits for 1 second
-        Debug.Log("After pause");
+        UnityEngine.Debug.Log("Before pause");
+        yield return new WaitForSeconds(0.5f); // Waits for 1 second
+        UnityEngine.Debug.Log("After pause");
 
         OnPathUpdated?.Invoke(shortestPath);
     }

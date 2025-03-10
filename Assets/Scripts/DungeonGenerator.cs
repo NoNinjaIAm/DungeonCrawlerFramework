@@ -24,7 +24,7 @@ public class DungeonGenerator : MonoBehaviour
     public Vector2Int size;
     public GameObject roomPrefab;
 
-    public event System.Action OnMazeGenerated;
+    public event System.Action<float> OnMazeGenerated;
 
     // TO DO: Change this so it clamps to valid values when assigned
     public Vector2Int startPos = new Vector2Int(0, 0);
@@ -34,15 +34,19 @@ public class DungeonGenerator : MonoBehaviour
     public float roomExtraDoorProb = 0.1f;
     public float roomObstacleSpawnProb = 0.1f;
 
+    public float timeToComplete;
+
 
     // Start is called before the first frame update
     void Start()
-    {
-        endPos = new Vector2Int(size.x-1, size.y-1);
-
-        size = new Vector2Int(GlobalOptions.Instance.xDungeonSize, GlobalOptions.Instance.xDungeonSize);
-        roomExtraDoorProb = GlobalOptions.Instance.extraDoorProb;
-        roomObstacleSpawnProb = GlobalOptions.Instance.obsSpawnProb;
+    { 
+        if (GlobalOptions.Instance != null)
+        {
+            size = new Vector2Int(GlobalOptions.Instance.xDungeonSize, GlobalOptions.Instance.xDungeonSize);
+            roomExtraDoorProb = GlobalOptions.Instance.extraDoorProb;
+            roomObstacleSpawnProb = GlobalOptions.Instance.obsSpawnProb;
+        }
+        endPos = new Vector2Int(size.x - 1, size.y - 1);
 
         MazeGenerator();
     }
@@ -80,7 +84,7 @@ public class DungeonGenerator : MonoBehaviour
 
         }
         // Dungeon has been generated event
-        OnMazeGenerated?.Invoke();
+        OnMazeGenerated?.Invoke(timeToComplete);
     }
 
     void SpawnObstacles()
@@ -206,7 +210,8 @@ public class DungeonGenerator : MonoBehaviour
 
         // Evaluating time took
         stopwatch.Stop();
-        UnityEngine.Debug.Log($"Dungeon Generation Took {stopwatch.ElapsedMilliseconds} ms.");
+        timeToComplete = stopwatch.ElapsedMilliseconds;
+        UnityEngine.Debug.Log($"Dungeon Generation Took {timeToComplete} ms.");
     }
 
     // Runs through the maze and places doors. Some rooms get no extra doors, and some may get 1, 2, or 3.
