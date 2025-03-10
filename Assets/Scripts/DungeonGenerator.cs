@@ -10,10 +10,9 @@ public class DungeonGenerator : MonoBehaviour
 {
     public class Room
     {
-        public Vector2Int position; // Room's coordinates for Manhattan distance
-        public Dictionary<Room, (float cost, string direction)> neighbors = new Dictionary<Room, (float cost, string direction)>();  // Adjacent rooms with movement cost
-        public float weight = 1.0f;
-        public bool hasObstacles = false;
+        public Vector2Int position; // Room's grid cordinates
+        public Dictionary<Room, string> neighbors = new Dictionary<Room, string>();  // Adjacent rooms with movement cost
+        public float weight = 1.0f; // Room's weight
     }
 
     // This is the grid with all of the rooms in it
@@ -52,7 +51,7 @@ public class DungeonGenerator : MonoBehaviour
             List<string> directions = new List<string>();
             foreach(var neighborKVP in kvp.Value.neighbors)
             {
-                directions.Add(neighborKVP.Value.direction);
+                directions.Add(neighborKVP.Value);
             }
 
             var newRoom = Instantiate(roomPrefab, new Vector3(kvp.Key.x * offset.x, 0, kvp.Key.y * offset.y), Quaternion.identity, transform).GetComponent<RoomBehaviour>();
@@ -66,6 +65,11 @@ public class DungeonGenerator : MonoBehaviour
                 UnityEngine.Debug.Log("Placing End Room at " + kvp.Key.x + "-" + kvp.Key.y);
                 newRoom.MakeEndRoom();
             }
+
+            // Adding obstacles
+            if (graph[kvp.Key].weight > 4.0f) newRoom.AddObstacles(true);
+            else newRoom.AddObstacles(false);
+
 
             // Printing room name
             newRoom.name += " " + kvp.Key.x + "-" + kvp.Key.y;
@@ -84,6 +88,10 @@ public class DungeonGenerator : MonoBehaviour
                 //Spawn Obstacles in current room
                 var curRoomKey = kvp.Key;
 
+                // Set room weight
+                graph[curRoomKey].weight = 100.0f;
+
+
                 UnityEngine.Debug.Log("Placing Obstacles in room:  " + curRoomKey.x + " " + curRoomKey.y);
 
                 // Changing every weight to travel to neighbors
@@ -95,13 +103,13 @@ public class DungeonGenerator : MonoBehaviour
                 //    UnityEngine.Debug.Log("Obstacle room:  " + curRoomKey.x + " " + curRoomKey.y + "has weighted travel to room " + graph[curRoomKey].neighbors[neighborKVP.Key].direction);
                 //}
 
-                foreach (var key in new List<Room>(graph[curRoomKey].neighbors.Keys))
-                {
-                    string direction = graph[curRoomKey].neighbors[key].direction;
+                //foreach (var key in new List<Room>(graph[curRoomKey].neighbors.Keys))
+                //{
+                //    string direction = graph[curRoomKey].neighbors[key];
 
-                    graph[curRoomKey].neighbors[key] = (20f, direction);
-                    UnityEngine.Debug.Log("Obstacle room:  " + curRoomKey.x + " " + curRoomKey.y + "has weighted travel to room " + graph[curRoomKey].neighbors[key].direction);
-                }
+                //    graph[curRoomKey].neighbors[key] = (100f, direction);
+                //    UnityEngine.Debug.Log("Obstacle room:  " + curRoomKey.x + " " + curRoomKey.y + "has weighted travel to room " + graph[curRoomKey].neighbors[key].direction);
+                //}
 
                 
             }
@@ -157,32 +165,32 @@ public class DungeonGenerator : MonoBehaviour
                 if(newRoomKey.y >  curRoomKey.y)
                 {
                     // Going North
-                    graph[curRoomKey].neighbors.Add(graph[newRoomKey], (graph[curRoomKey].weight, "North"));
-                    graph[newRoomKey].neighbors.Add(graph[curRoomKey], (graph[newRoomKey].weight, "South"));
+                    graph[curRoomKey].neighbors.Add(graph[newRoomKey], "North");
+                    graph[newRoomKey].neighbors.Add(graph[curRoomKey], "South");
                     curRoomKey = newRoomKey;
 
                 }
                 else if (newRoomKey.y < curRoomKey.y)
                 {
                     // Going South
-                    graph[curRoomKey].neighbors.Add(graph[newRoomKey], (graph[curRoomKey].weight, "South"));
-                    graph[newRoomKey].neighbors.Add(graph[curRoomKey], (graph[newRoomKey].weight, "North"));
+                    graph[curRoomKey].neighbors.Add(graph[newRoomKey], "South");
+                    graph[newRoomKey].neighbors.Add(graph[curRoomKey], "North");
                     curRoomKey = newRoomKey;
 
                 }
                 else if (newRoomKey.x > curRoomKey.x)
                 {
                     // Going East
-                    graph[curRoomKey].neighbors.Add(graph[newRoomKey], (graph[curRoomKey].weight, "East"));
-                    graph[newRoomKey].neighbors.Add(graph[curRoomKey], (graph[newRoomKey].weight, "West"));
+                    graph[curRoomKey].neighbors.Add(graph[newRoomKey], "East");
+                    graph[newRoomKey].neighbors.Add(graph[curRoomKey], "West");
                     curRoomKey = newRoomKey;
 
                 }
                 else
                 {
                     // Going West
-                    graph[curRoomKey].neighbors.Add(graph[newRoomKey], (graph[curRoomKey].weight, "West"));
-                    graph[newRoomKey].neighbors.Add(graph[curRoomKey], (graph[newRoomKey].weight, "East"));
+                    graph[curRoomKey].neighbors.Add(graph[newRoomKey], "West");
+                    graph[newRoomKey].neighbors.Add(graph[curRoomKey], "East");
                     curRoomKey = newRoomKey;
 
                 }
@@ -217,29 +225,29 @@ public class DungeonGenerator : MonoBehaviour
                     if (newRoomKey.y > curRoomKey.y)
                     {
                         // Place Edge North
-                        graph[curRoomKey].neighbors.Add(graph[newRoomKey], (graph[curRoomKey].weight, "North"));
-                        graph[newRoomKey].neighbors.Add(graph[curRoomKey], (graph[newRoomKey].weight, "South"));
+                        graph[curRoomKey].neighbors.Add(graph[newRoomKey], "North");
+                        graph[newRoomKey].neighbors.Add(graph[curRoomKey], "South");
 
                     }
                     else if (newRoomKey.y < curRoomKey.y)
                     {
                         // Place Edge South
-                        graph[curRoomKey].neighbors.Add(graph[newRoomKey], (graph[curRoomKey].weight, "South"));
-                        graph[newRoomKey].neighbors.Add(graph[curRoomKey], (graph[newRoomKey].weight, "North"));
+                        graph[curRoomKey].neighbors.Add(graph[newRoomKey], "South");
+                        graph[newRoomKey].neighbors.Add(graph[curRoomKey], "North");
 
                     }
                     else if (newRoomKey.x > curRoomKey.x)
                     {
                         // Place Edge East
-                        graph[curRoomKey].neighbors.Add(graph[newRoomKey], (graph[curRoomKey].weight, "East"));
-                        graph[newRoomKey].neighbors.Add(graph[curRoomKey], (graph[newRoomKey].weight, "West"));
+                        graph[curRoomKey].neighbors.Add(graph[newRoomKey], "East");
+                        graph[newRoomKey].neighbors.Add(graph[curRoomKey], "West");
 
                     }
                     else
                     {
                         // Place Edge West
-                        graph[curRoomKey].neighbors.Add(graph[newRoomKey], (graph[curRoomKey].weight, "West"));
-                        graph[newRoomKey].neighbors.Add(graph[curRoomKey], (graph[newRoomKey].weight, "East"));
+                        graph[curRoomKey].neighbors.Add(graph[newRoomKey], "West");
+                        graph[newRoomKey].neighbors.Add(graph[curRoomKey], "East");
 
                     }
 

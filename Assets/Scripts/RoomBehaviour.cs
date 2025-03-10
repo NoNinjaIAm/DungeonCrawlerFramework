@@ -9,8 +9,11 @@ public class RoomBehaviour : MonoBehaviour
     public GameObject[] walls; // 0 - North 1 -South 2 - East 3- West
     public GameObject[] doors;
     public GameObject sucessObject;
+    public GameObject obstacles;
+    public GameObject weightVisual;
     public GameObject shortestPathHighlight;
     public Vector2Int myGridPosition;
+    public Material weightedRoomMaterial;
 
     private void Start()
     {
@@ -37,6 +40,15 @@ public class RoomBehaviour : MonoBehaviour
 
         if (directions.Contains("West")) SetDoorStatus(true, 3);
         else SetDoorStatus(false, 3);
+    }
+
+    public void AddObstacles(bool addObstacles)
+    {
+        if (addObstacles)
+        {
+            weightVisual.GetComponent<MeshRenderer>().material = weightedRoomMaterial;
+        }
+        obstacles.SetActive(addObstacles);
     }
 
     public void MakeEndRoom()

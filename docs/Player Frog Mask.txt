@@ -1,0 +1,31 @@
+Linking boss room
+music work
+cutscene work
+Enemy damage once bug
+Hit Delay
+
+Done: 
+Player Frog Mask
+Player terminal velocity
+Basic Game UI
+Basic Death Implementation
+Basic Shop Functionality
+Enemy Projectile Functionality (or atleadt from a player side)
+camera smoothing
+Player Spritework
+Player spritework implementation
+Falling spikes and spikework
+Player looks toward gun, gun animations
+Double Jump Shotgun functionality
+Player can move if falling off of platform
+Player Bug with double jump shotgun and ammo (double jump uses ammo)
+Mines level Design
+Linking levels together
+Bullets look different
+
+Backlog:
+Mines further polishing
+Frog mask obtained splash text
+E button interactable objects
+player sounds
+TJ costume

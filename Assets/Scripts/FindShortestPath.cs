@@ -67,6 +67,9 @@ public class FindShortestPath : MonoBehaviour
             // Select the Room with the lowest FCost (GCost + HCost)
             Room currentRoom = openSet.OrderBy(room => gCost[room] + hCost[room]).First();
 
+            // Get the cost of moving anywhere from this room
+            float moveCost = currentRoom.weight;
+
             // If we reached the target room, reconstruct and return the path
             if (currentRoom == targetRoom)
                 return ReconstructPath(cameFrom, targetRoom);
@@ -75,15 +78,14 @@ public class FindShortestPath : MonoBehaviour
             closedSet.Add(currentRoom);
 
             Debug.Log($"Processing room {currentRoom.position.x}-{currentRoom.position.y}");
-            Debug.Log("Has neighbors: ");
+            // Debug.Log("Has neighbors: ");
 
             // Process each neighboring room
             foreach (var neighborPair in currentRoom.neighbors)
             {
                 Room neighbor = neighborPair.Key;
-                float moveCost = neighborPair.Value.cost;
 
-                Debug.Log(neighbor.position.x + " " + neighbor.position.y);
+                // Debug.Log(neighbor.position.x + " " + neighbor.position.y);
 
                 if (closedSet.Contains(neighbor))
                     continue; // Skip already processed rooms
@@ -97,8 +99,7 @@ public class FindShortestPath : MonoBehaviour
                     hCost[neighbor] = ManhattanDistance(neighbor, targetRoom);
                     cameFrom[neighbor] = currentRoom;
 
-                    if (!openSet.Contains(neighbor))
-                        openSet.Add(neighbor);
+                    if (!openSet.Contains(neighbor)) openSet.Add(neighbor);
                 }
             }
         }
