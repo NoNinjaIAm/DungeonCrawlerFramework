@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.Video;
 using static DungeonGenerator;
@@ -18,6 +19,9 @@ public class RoomBehaviour : MonoBehaviour
     private void Start()
     {
         Debug.Log("Room" + myGridPosition.x + "-" + myGridPosition.y + "is ready to listen for shortest path");
+
+        //gameObject.SetActive(false);    
+
         FindShortestPath.Instance.OnPathUpdated += OnPathUpdated;
     }
 

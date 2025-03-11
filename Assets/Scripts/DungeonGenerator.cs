@@ -10,8 +10,8 @@ public class DungeonGenerator : MonoBehaviour
 {
     public class Room
     {
-        public Vector2Int position; // Room's grid cordinates
-        public Dictionary<Room, string> neighbors = new Dictionary<Room, string>();  // Adjacent rooms with movement cost
+        public Vector2Int position; // Room's grid cordinates. For Manhattan Distance
+        public Dictionary<Room, string> neighbors = new Dictionary<Room, string>();  // Adjacent rooms and the directions to them
         public float weight = 1.0f; // Room's weight
     }
 
@@ -75,7 +75,7 @@ public class DungeonGenerator : MonoBehaviour
             }
 
             // Adding obstacles
-            if (graph[kvp.Key].weight > 4.0f) newRoom.AddObstacles(true);
+            if (graph[kvp.Key].weight > 1.5f) newRoom.AddObstacles(true);
             else newRoom.AddObstacles(false);
 
 
@@ -97,29 +97,8 @@ public class DungeonGenerator : MonoBehaviour
                 var curRoomKey = kvp.Key;
 
                 // Set room weight
-                graph[curRoomKey].weight = 100.0f;
-
-
+                graph[curRoomKey].weight = GlobalOptions.Instance.obsWeight;
                 UnityEngine.Debug.Log("Placing Obstacles in room:  " + curRoomKey.x + " " + curRoomKey.y);
-
-                // Changing every weight to travel to neighbors
-                //foreach (var neighborKVP in graph[curRoomKey].neighbors)
-                //{
-                //    string direction = graph[curRoomKey].neighbors[neighborKVP.Key].direction;
-
-                //    graph[curRoomKey].neighbors[neighborKVP.Key] = (20f, direction);
-                //    UnityEngine.Debug.Log("Obstacle room:  " + curRoomKey.x + " " + curRoomKey.y + "has weighted travel to room " + graph[curRoomKey].neighbors[neighborKVP.Key].direction);
-                //}
-
-                //foreach (var key in new List<Room>(graph[curRoomKey].neighbors.Keys))
-                //{
-                //    string direction = graph[curRoomKey].neighbors[key];
-
-                //    graph[curRoomKey].neighbors[key] = (100f, direction);
-                //    UnityEngine.Debug.Log("Obstacle room:  " + curRoomKey.x + " " + curRoomKey.y + "has weighted travel to room " + graph[curRoomKey].neighbors[key].direction);
-                //}
-
-                
             }
         }
     }
@@ -139,7 +118,7 @@ public class DungeonGenerator : MonoBehaviour
         graph.Add(startPos, tempRoom);
         Vector2Int curRoomKey = startPos;
         
-        while(k<10000)
+        while(k<100000000)
         {
             k++;
 
@@ -206,12 +185,16 @@ public class DungeonGenerator : MonoBehaviour
         }
         PlaceRandomDoorsAndObstacles();
         SpawnObstacles();
-        GenerateDungeon();
 
         // Evaluating time took
         stopwatch.Stop();
         timeToComplete = stopwatch.ElapsedMilliseconds;
         UnityEngine.Debug.Log($"Dungeon Generation Took {timeToComplete} ms.");
+
+        if (GlobalOptions.Instance.renderRooms) GenerateDungeon();
+        else OnMazeGenerated?.Invoke(timeToComplete);
+
+
     }
 
     // Runs through the maze and places doors. Some rooms get no extra doors, and some may get 1, 2, or 3.

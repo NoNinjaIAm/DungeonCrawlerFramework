@@ -5,10 +5,13 @@ public class GlobalOptions : MonoBehaviour
 {
     public static GlobalOptions Instance { get; private set; }
 
-    public int xDungeonSize { get; private set; }
-    public int yDungeonSize { get; private set; }
-    public float extraDoorProb { get; private set; }
-    public float obsSpawnProb { get; private set; }
+    public int xDungeonSize = 5;
+    public int yDungeonSize = 5;
+    public float extraDoorProb = .5f;
+    public float obsSpawnProb = .5f;
+    public float obsWeight = 3f;
+
+    public bool renderRooms;
 
     private void Awake()
     {
@@ -16,8 +19,6 @@ public class GlobalOptions : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject); // Optional: Keeps the instance across scenes
-
-            SetOptions();
         }
         else
         {

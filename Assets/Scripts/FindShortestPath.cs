@@ -25,6 +25,7 @@ public class FindShortestPath : MonoBehaviour
     public event System.Action<float> OnAStarFinished;
     private float timeTaken;
 
+    private static float averageWeight;
 
 
     private void Awake()
@@ -38,7 +39,16 @@ public class FindShortestPath : MonoBehaviour
     {
         dungeonGenerator.OnMazeGenerated += OnMazeGenerated;
     }
-    
+
+    private static float EstimateAverageWeight()
+    {
+        float numRooms = (float)GlobalOptions.Instance.xDungeonSize * (float)GlobalOptions.Instance.yDungeonSize;
+        float numWeightedRooms = numRooms * GlobalOptions.Instance.obsSpawnProb; // Getting an estimated number of weighted rooms
+        float numNormalRooms = numRooms - numWeightedRooms;
+
+        return ((numWeightedRooms * GlobalOptions.Instance.obsWeight) + numNormalRooms) / numRooms;
+    }
+
     private void OnMazeGenerated(float time)
     {
         UnityEngine.Debug.Log("Looking for shortest path");
@@ -63,11 +73,14 @@ public class FindShortestPath : MonoBehaviour
 
     public static List<Room> AStar (Room startRoom, Room targetRoom)
     {
+        // Get an average room weight estimate
+        averageWeight = EstimateAverageWeight();
+        UnityEngine.Debug.Log("Average weighted room estimate: " +  averageWeight);
 
-        // Open Set: Rooms to evaluate
+        // Rooms to look at
         List<Room> openSet = new List<Room> { startRoom };
 
-        // Closed Set: Rooms already evaluated
+        // Rooms we already looked at
         HashSet<Room> closedSet = new HashSet<Room>();
 
         // Cost Tracking
@@ -83,7 +96,7 @@ public class FindShortestPath : MonoBehaviour
             // Get the cost of moving anywhere from this room
             float moveCost = currentRoom.weight;
 
-            // If we reached the target room, reconstruct and return the path
+            // If we reached the target room, reconstruct and return the shortest path
             if (currentRoom == targetRoom)
                 return ReconstructPath(cameFrom, targetRoom);
 
@@ -93,18 +106,21 @@ public class FindShortestPath : MonoBehaviour
             UnityEngine.Debug.Log($"Processing room {currentRoom.position.x}-{currentRoom.position.y}");
             // Debug.Log("Has neighbors: ");
 
-            // Process each neighboring room
+            // Look at each neighbor
             foreach (var neighborPair in currentRoom.neighbors)
             {
                 Room neighbor = neighborPair.Key;
 
                 // Debug.Log(neighbor.position.x + " " + neighbor.position.y);
 
+                // If we have already evaulated the neaigbor skip it
                 if (closedSet.Contains(neighbor))
-                    continue; // Skip already processed rooms
+                    continue; 
 
+                // Cost to move to nieghor
                 float tentativeGCost = gCost[currentRoom] + moveCost;
 
+                // If moving to neighbor is cheaper from current room then existing room or if nighebor doesn't have a gCost yet
                 if (!gCost.ContainsKey(neighbor) || tentativeGCost < gCost[neighbor])
                 {
                     // Update costs and parent reference
@@ -141,7 +157,9 @@ public class FindShortestPath : MonoBehaviour
 
     private static float ManhattanDistance(Room a, Room b)
     {
-        return Mathf.Abs(a.position.x - b.position.x) + Mathf.Abs(a.position.y - b.position.y);
+        return Mathf.Abs(a.position.x - b.position.x) + Mathf.Abs(a.position.y - b.position.y) * averageWeight;
+        //return Mathf.Abs(a.position.x - b.position.x) + Mathf.Abs(a.position.y - b.position.y);
+        //return 0;
     }
 
     IEnumerator DelayedSignalInvoke()
