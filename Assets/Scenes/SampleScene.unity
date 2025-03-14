@@ -642,7 +642,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60cf99f3f9ebd82488a72104ddb586bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 10
+  speed: 40
   lookSpeed: 2
   sprintMultiplier: 2
 --- !u!1 &818965955
@@ -1238,12 +1238,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a74820d74ba968a46b0914d09e2942f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xDungeonSize: 50
-  yDungeonSize: 50
-  extraDoorProb: 0
+  xDungeonSize: 100
+  yDungeonSize: 100
+  extraDoorProb: 0.5
   obsSpawnProb: 0.5
   obsWeight: 3
   renderRooms: 1
+  showObjects: 0
+  showVisualizer: 1
 --- !u!4 &1967896588
 Transform:
   m_ObjectHideFlags: 0

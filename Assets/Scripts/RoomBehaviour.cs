@@ -9,12 +9,18 @@ public class RoomBehaviour : MonoBehaviour
 {
     public GameObject[] walls; // 0 - North 1 -South 2 - East 3- West
     public GameObject[] doors;
+    public GameObject[] doorVisualizers;
+    public GameObject floor;
+    public GameObject fillerWalls;
     public GameObject sucessObject;
     public GameObject obstacles;
     public GameObject weightVisual;
     public GameObject shortestPathHighlight;
     public Vector2Int myGridPosition;
+    
     public Material weightedRoomMaterial;
+    public Material startingRoomMaterial;
+    public Material endRoomMaterial;
 
     private void Start()
     {
@@ -23,6 +29,21 @@ public class RoomBehaviour : MonoBehaviour
         //gameObject.SetActive(false);    
 
         FindShortestPath.Instance.OnPathUpdated += OnPathUpdated;
+        if (!GlobalOptions.Instance.showObjects)
+        {
+            foreach (GameObject wall in walls)
+            {
+                wall.SetActive(false);
+            }
+            fillerWalls.SetActive(false);
+            floor.SetActive(false);
+        }
+
+        if (GlobalOptions.Instance.showVisualizer)
+        {
+            weightVisual.SetActive(true);
+
+        }
     }
 
     public void UpdateDoorways(List<string> directions)
@@ -32,7 +53,7 @@ public class RoomBehaviour : MonoBehaviour
         //    doors[i].SetActive(status[i]);
         //    walls[i].SetActive(!status[i]);
         //}
-
+        
         if(directions.Contains("North")) SetDoorStatus(true, 0);
         else SetDoorStatus(false, 0);
 
@@ -48,26 +69,51 @@ public class RoomBehaviour : MonoBehaviour
 
     public void AddObstacles(bool addObstacles)
     {
-        if (addObstacles)
+        
+        if (addObstacles && GlobalOptions.Instance.showVisualizer)
         {
             weightVisual.GetComponent<MeshRenderer>().material = weightedRoomMaterial;
         }
+
+        // Return here if objects won't be rendered anyway
+        if (!GlobalOptions.Instance.showObjects) return;
+
         obstacles.SetActive(addObstacles);
     }
 
     public void MakeEndRoom()
     {
+        if (GlobalOptions.Instance.showVisualizer)
+        {
+            weightVisual.GetComponent<MeshRenderer>().material = endRoomMaterial;
+        }
+
+        if (!GlobalOptions.Instance.showObjects) return;
         sucessObject.SetActive(true);
+    }
+
+    public void MakeStartRoom()
+    {
+        if (!GlobalOptions.Instance.showVisualizer) return;
+        weightVisual.GetComponent<MeshRenderer>().material = startingRoomMaterial;
     }
 
     private void SetDoorStatus(bool value, int index)
     {
+        if (GlobalOptions.Instance.showVisualizer)
+        {
+            doorVisualizers[index].SetActive(value);
+        }
+
+        if (!GlobalOptions.Instance.showObjects) return;
         doors[index].SetActive(value);
         walls[index].SetActive(!value);
     }
 
     private void OnPathUpdated(List<Room> path)
     {
+        if (!GlobalOptions.Instance.showVisualizer) return;
+
         bool inPath = false;
         foreach (var room in path)
         {

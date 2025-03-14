@@ -12,6 +12,8 @@ public class GlobalOptions : MonoBehaviour
     public float obsWeight = 3f;
 
     public bool renderRooms;
+    public bool showObjects = true;
+    public bool showVisualizer = true;
 
     private void Awake()
     {

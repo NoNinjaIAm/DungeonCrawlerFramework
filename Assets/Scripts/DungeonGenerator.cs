@@ -66,17 +66,23 @@ public class DungeonGenerator : MonoBehaviour
             
             newRoom.UpdateDoorways(directions);
             newRoom.myGridPosition = kvp.Key;
-            
-            // Spawning target room object
-            if(kvp.Key == endPos)
-            {
-                UnityEngine.Debug.Log("Placing End Room at " + kvp.Key.x + "-" + kvp.Key.y);
-                newRoom.MakeEndRoom();
-            }
 
             // Adding obstacles
             if (graph[kvp.Key].weight > 1.5f) newRoom.AddObstacles(true);
             else newRoom.AddObstacles(false);
+
+            // If we're at the ending room
+            if (kvp.Key == endPos)
+            {
+                UnityEngine.Debug.Log("Placing End Room at " + kvp.Key.x + "-" + kvp.Key.y);
+                newRoom.MakeEndRoom();
+            }
+            // If we're at the starting room
+            if (kvp.Key == startPos)
+            {
+                UnityEngine.Debug.Log("Placing Start Room at " + kvp.Key.x + "-" + kvp.Key.y);
+                newRoom.MakeStartRoom();
+            }
 
 
             // Printing room name
