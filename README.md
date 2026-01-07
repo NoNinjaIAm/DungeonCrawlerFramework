@@ -79,7 +79,4 @@ This project is actively usable as a foundation. No further development is being
 
 ---
 
-## 📜 License
-
-MIT (or whatever you’re using — update as needed)
 
