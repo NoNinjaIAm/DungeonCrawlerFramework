@@ -75,7 +75,7 @@ The framework doesn’t assume how your game *looks*—only how it *works*.
 
 ## 🛠️ Status
 
-This project is actively usable as a foundation and may evolve as new features or experiments are added.
+This project is actively usable as a foundation. No further development is being pursued.
 
 ---
 
